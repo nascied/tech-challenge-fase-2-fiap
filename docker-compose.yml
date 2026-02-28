@@ -1,0 +1,235 @@
+services:
+  auth-services-app:
+    image: auth-service-app:v1.0
+    build:
+      context: auth-service
+      dockerfile: Dockerfile
+    ports:
+      - 8001:8001
+    container_name: auth-services-app
+    networks:
+      - front-tier-public
+      - back-tier-private
+    depends_on:
+      auth-pg-db:
+        condition: service_healthy
+    env_file:
+      - ./auth-service/config.env
+  pgadmin:
+    image: dpage/pgadmin4:snapshot
+    env_file:
+      - ./auth-service/config.env
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin-pg-data:/var/lib/pgadmin
+    networks:
+      - back-tier-private
+    restart: unless-stopped
+    depends_on:
+      auth-pg-db:
+        condition: service_healthy
+      flag-pg-db:
+        condition: service_healthy
+      targeting-pg-db:
+        condition: service_healthy
+  auth-pg-db:
+    image: postgres
+    container_name: auth-pg-db
+    env_file:
+      - ./auth-service/config.env
+    ports:
+      - "5001:5432"
+    volumes:
+      - auth-pg-data:/var/lib/postgresql
+      - ./auth-service/db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - back-tier-private
+  flag-services-app:
+    image: flag-service-app:v1.0
+    build:
+      context: flag-service
+      dockerfile: Dockerfile
+    ports:
+      - 8002:8002
+    container_name: flag-services-app
+    networks:
+      - front-tier-public
+      - back-tier-private
+    depends_on:
+      flag-pg-db:
+        condition: service_healthy
+      auth-services-app:
+        condition: service_started
+    env_file:
+      - ./flag-service/config.env
+
+  flag-pg-db:
+    image: postgres
+    container_name: flag-pg-db
+    env_file:
+      - ./flag-service/config.env
+    ports:
+      - "5002:5432"
+    volumes:
+      - flag-pg-data:/var/lib/postgresql
+      - ./flag-service/db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - back-tier-private
+
+  targeting-services-app:
+    image: targeting-service-app:v1.0
+    build:
+      context: targeting-service
+      dockerfile: Dockerfile
+    ports:
+      - 8003:8003
+    container_name: targeting-services-app
+    networks:
+      - front-tier-public
+      - back-tier-private
+    depends_on:
+      targeting-pg-db:
+        condition: service_healthy
+      auth-services-app:
+        condition: service_started
+    env_file:
+      - ./targeting-service/config.env
+
+  targeting-pg-db:
+    image: postgres
+    container_name: targeting-pg-db
+    env_file:
+      - ./targeting-service/config.env
+    ports:
+      - "5003:5432"
+    volumes:
+      - targeting-pg-data:/var/lib/postgresql
+      - ./targeting-service/db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - back-tier-private
+
+  evaluation-services-app:
+    image: evaluation-service-app:v1.0
+    build:
+      context: evaluation-service
+      dockerfile: Dockerfile
+    ports:
+      - 8004:8004
+    container_name: evaluation-services-app
+    networks:
+      - front-tier-public
+      - back-tier-private
+    depends_on:
+      redis-db:
+        condition: service_healthy
+      auth-services-app:
+        condition: service_started
+      flag-services-app:
+        condition: service_started
+      targeting-services-app:
+        condition: service_started
+      localstack:
+        condition: service_healthy
+        
+    env_file:
+      - ./evaluation-service/config.env
+
+  redis-db:
+    image: redis:8.2.4-alpine
+    container_name: redis-db
+    # env_file:
+    #   - ./targeting-service/config.env
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli", "PING"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - back-tier-private 
+  localstack:
+    image: localstack/localstack
+    container_name: localstack
+    env_file:
+      - ./evaluation-service/config.env
+    ports:
+      - "4566:4566"
+      # - "127.0.0.1:4566:4566"            # LocalStack Gateway
+      # - "127.0.0.1:4510-4559:4510-4559"  # external services port range
+    environment:
+      - SERVICES=sqs,dynamodb
+      # LocalStack configuration: https://docs.localstack.cloud/references/configuration/
+      - DEBUG=0
+    volumes:
+      - ./evaluation-service/scripts:/etc/localstack/init/ready.d
+      - /var/run/docker.sock:/var/run/docker.sock
+      - localstack-data:/var/lib/localstack
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:4566/_localstack/health"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    networks:
+      - back-tier-private
+
+  analytics-services-app:
+    build:
+      context: analytics-service
+      dockerfile: Dockerfile
+    container_name: analytics-services-app
+    ports:
+      - "8005:8005"
+    env_file:
+      - ./analytics-service/config.env
+    depends_on:
+      evaluation-services-app:
+        condition: service_started
+      localstack:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8005/health"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    networks:
+      - front-tier-public
+      - back-tier-private
+
+networks:
+  front-tier-public: {}
+  back-tier-private: {}
+
+volumes:
+  auth-pg-data:
+  flag-pg-data:
+  targeting-pg-data:
+  pgadmin-pg-data:
+  redis-data:
+  localstack-data:
