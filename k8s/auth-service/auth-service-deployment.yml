@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: auth-service
-  namespace: fiap-tc-f2
 spec:
   selector:
     matchLabels:
@@ -52,8 +51,8 @@ spec:
                   key: DATABASE_URL
             - name: PORT
               valueFrom:
-                secretKeyRef: 
-                  name: auth-service-secret
+                configMapKeyRef:
+                  name: auth-service-config-map
                   key: PORT
             - name: MASTER_KEY
               valueFrom:

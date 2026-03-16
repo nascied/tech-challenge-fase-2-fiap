@@ -109,3 +109,32 @@ output "aws_ecr_repository_repository_url" {
 #---------------------
 # SQS outputs
 #---------------------
+
+#----------------------------
+# elasticcache
+#----------------------------
+
+output "aws_elasticache_cluster_arn" {
+  value       = module.cache.aws_elasticache_cluster_arn
+  description = "Arn do elasticache"
+}
+
+output "aws_elasticache_cluster_engine_version_actual" {
+  value       = module.cache.aws_elasticache_cluster_engine_version_actual
+  description = "Versão da engine do elasticache"
+}
+
+output "aws_elasticache_cluster_cache_nodes" {
+  value       = module.cache.aws_elasticache_cluster_cache_nodes
+  description = "Informações de nodes cache"
+}
+
+output "aws_elasticache_cluster_cluster_address" {
+  value       = module.cache.aws_elasticache_cluster_cluster_address
+  description = "Endereço do cluster elasticache"
+}
+
+output "aws_elasticache_cluster_configuration_endpoint" {
+  value       = module.cache.aws_elasticache_cluster_configuration_endpoint
+  description = "Endpoint do elasticache"
+}

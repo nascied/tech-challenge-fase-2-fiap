@@ -17,7 +17,8 @@ module "db" {
 module "eks" {
   source = "./modules/cluster"
 
-  aws_subnet_public_ids = module.vpc.public_subnet_id
+  aws_subnet_public_ids  = module.vpc.public_subnet_id
+  aws_subnet_private_ids = module.vpc.private_subnet_id
 
   depends_on = [module.vpc]
 }
@@ -32,4 +33,10 @@ module "sqs" {
   source = "./modules/sqs"
 
   aws_sqs_queue_name = var.aws_sqs_queue_name
+}
+
+module "cache" {
+  source = "./modules/elasticache"
+
+  subnet_elasticache_group = module.vpc.private_subnet_id
 }

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: configMap
+metadata:
+  name: evalatuation-service-config-map
+data:
+  AUTH_SERVICE_URL: "http://auth-service-svc:8001"
+  PORT: "8004"
