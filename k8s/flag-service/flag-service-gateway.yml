@@ -1,14 +1,14 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: auth-service-gateway
-  namespace: fiap-tc-f2
+  name: flag-service-gateway
+ 
 spec:
   gatewayClassName: nginx
   listeners:
-  - name: http-auth-service-8001
+  - name: http-flag-service-8002
     protocol: HTTP
-    port: 8001
+    port: 8002
     allowedRoutes:
       namespaces:
         from: Same 

@@ -1,13 +1,13 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: auth-service-hpa
-  namespace: fiap-tc-f2
+  name: flag-service-hpa
+ 
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: auth-service
+    name: flag-service
   minReplicas: 1      # Mínimo 1 pod
   maxReplicas: 3      # Máximo 3 pods
   

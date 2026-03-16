@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: auth-service-svc
-  namespace: fiap-tc-f2
+  name: analytics-service-svc
+ 
 spec:
   selector:
-    app: auth-service
+    app: analytics-service
   ports:
-  - port: 8001
-    targetPort: 8001
+  - port: 8005
+    targetPort: 8005
     protocol: TCP
