@@ -35,45 +35,8 @@ O sistema é composto por 5 microsserviços:
 
 ### 📊 Diagrama da Arquitetura
 
-```
-                                    ┌─────────────────────────────────────────┐
-                                    │            AWS Cloud                     │
-                                    │  ┌─────────────────────────────────────┐│
-                                    │  │     Application Load Balancer       ││
-                                    │  │        (Nginx Ingress)              ││
-                                    │  └──────────────┬──────────────────────┘│
-                                    │                 │                        │
-                                    │  ┌──────────────▼──────────────────────┐│
-                                    │  │         Amazon EKS Cluster          ││
-                                    │  │                                      ││
-                                    │  │  ┌─────────┐  ┌─────────┐           ││
-                                    │  │  │  auth   │  │  flag   │           ││
-                                    │  │  │ service │  │ service │           ││
-                                    │  │  └────┬────┘  └────┬────┘           ││
-                                    │  │       │            │                 ││
-                                    │  │  ┌────┴────┐  ┌────┴────┐           ││
-                                    │  │  │targeting│  │evaluate │           ││
-                                    │  │  │ service │  │ service │           ││
-                                    │  │  └─────────┘  └────┬────┘           ││
-                                    │  │                    │                 ││
-                                    │  │            ┌───────┴───────┐        ││
-                                    │  │            │   analytics   │        ││
-                                    │  │            │    service    │        ││
-                                    │  │            └───────────────┘        ││
-                                    │  └──────────────────────────────────────┘│
-                                    │                                          │
-                                    │  ┌────────────┐ ┌────────────┐          │
-                                    │  │ RDS        │ │ElastiCache │          │
-                                    │  │ PostgreSQL │ │   Redis    │          │
-                                    │  │ (3 inst.)  │ │            │          │
-                                    │  └────────────┘ └────────────┘          │
-                                    │                                          │
-                                    │  ┌────────────┐ ┌────────────┐          │
-                                    │  │  DynamoDB  │ │    SQS     │          │
-                                    │  │            │ │            │          │
-                                    │  └────────────┘ └────────────┘          │
-                                    └──────────────────────────────────────────┘
-```
+![Alt text](./image/aws_arquitetura_togglemaster.png)
+
 
 ## 🛠️ Tecnologias Utilizadas
 
@@ -88,7 +51,6 @@ O sistema é composto por 5 microsserviços:
 ## 📁 Estrutura do Projeto
 
 ```
-tech-challenge-fase2/
 ├── analytics-service
 │   ├── app.py
 │   ├── config.env
@@ -137,17 +99,13 @@ tech-challenge-fase2/
 │       │   │   ├── locals.tf
 │       │   │   ├── main.tf
 │       │   │   ├── output.tf
-│       │   │   └── variable.tf
-│       │   ├── db
-│       │   │   ├── data.tf
-│       │   │   ├── locals.tf
-│       │   │   ├── main.tf
-│       │   │   ├── output.tf
+│       │   │   ├── README.md
 │       │   │   └── variable.tf
 │       │   ├── dynamodb
 │       │   │   ├── locals.tf
 │       │   │   ├── main.tf
 │       │   │   ├── output.tf
+│       │   │   ├── README.md
 │       │   │   └── variable.tf
 │       │   ├── elasticache
 │       │   │   ├── locals.tf
@@ -159,69 +117,78 @@ tech-challenge-fase2/
 │       │   │   ├── igw.tf
 │       │   │   ├── natgateway.tf
 │       │   │   ├── output.tf
+│       │   │   ├── README.md
 │       │   │   ├── rt.tf
 │       │   │   ├── subnet.tf
 │       │   │   ├── variable.tf
 │       │   │   └── vpc.tf
+│       │   ├── rds
+│       │   │   ├── data.tf
+│       │   │   ├── locals.tf
+│       │   │   ├── main.tf
+│       │   │   ├── output.tf
+│       │   │   ├── README.md
+│       │   │   └── variable.tf
 │       │   ├── registry
 │       │   │   ├── locals.tf
 │       │   │   ├── main.tf
 │       │   │   ├── output.tf
+│       │   │   ├── README.md
 │       │   │   └── variable.tf
 │       │   └── sqs
 │       │       ├── locals.tf
 │       │       ├── main.tf
 │       │       ├── output.tf
+│       │       ├── README.md
 │       │       └── variable.tf
 │       ├── output.tf
 │       ├── provider.tf
 │       ├── README.md
 │       ├── required.tf
 │       ├── terraform.tfstate
+│       ├── terraform.tfstate.1773632854.backup
+│       ├── terraform.tfstate.1773804334.backup
+│       ├── terraform.tfstate.1773804411.backup
+│       ├── terraform.tfstate.1773804417.backup
 │       ├── terraform.tfstate.backup
 │       ├── terraform.tfvars
 │       └── variable.tf
+├── image
+│   └── aws_arquitetura_togglemaster.png
 ├── k8s
 │   ├── analytics-service
-│   │   ├── analytics-gateway.yml
 │   │   ├── analytics-service-configMap.yml
 │   │   ├── analytics-service-deployment.yml
 │   │   ├── analytics-service-hpa.yml
-│   │   ├── analytics-service-httproute.yml
 │   │   ├── analytics-service-secret.yml
 │   │   └── analytics-service-service.yml
 │   ├── auth-service
 │   │   ├── auth-service-configMap.yml
 │   │   ├── auth-service-deployment.yml
-│   │   ├── auth-service-gateway.yml
 │   │   ├── auth-service-hpa.yml
-│   │   ├── auth-service-httproute.yml
 │   │   ├── auth-service-secret.yml
 │   │   └── auth-service-service.yml
 │   ├── common
-│   │   └── kustomization.yml
+│   │   ├── gatewayclass.yml
+│   │   ├── ingress.yml
+│   │   ├── kustomization.yml
+│   │   └── namespace.yml
 │   ├── evaluation-service
 │   │   ├── evaluation-service-configMap.yml
 │   │   ├── evaluation-service-deployment.yml
-│   │   ├── evaluation-service-gateway.yml
 │   │   ├── evaluation-service-hpa.yml
-│   │   ├── evaluation-service-httproute.yml
 │   │   ├── evaluation-service-secret.yml
 │   │   └── evaluation-service-service.yml
 │   ├── flag-service
 │   │   ├── flag-service-configMap.yml
 │   │   ├── flag-service-deployment.yml
-│   │   ├── flag-service-gateway.yml
 │   │   ├── flag-service-hpa.yml
-│   │   ├── flag-service-httproute.yml
 │   │   ├── flag-service-secret.yml
 │   │   └── flag-service-service.yml
 │   └── targeting-service
 │       ├── targeting-service-configMap.yml
 │       ├── targeting-service-deployment.yml
-│       ├── targeting-service-gateway.yml
 │       ├── targeting-service-hpa.yml
-│       ├── targeting-service-httproute.yml
 │       ├── targeting-service-secret.yml
 │       └── targeting-service-service.yml
 ├── README.md
@@ -232,7 +199,9 @@ tech-challenge-fase2/
     │   └── init.sql
     ├── Dockerfile
     ├── README.md
-    └── requirements.txt
+    ├── requirements.txt
+    └── terraform.tfstate
+
 ```
 
 ---
@@ -316,120 +285,101 @@ curl "http://localhost:8004/evaluate?flag_name=enable-new-feature&user_id=user-1
 - eksctl instalado (para conta pessoal)
 - Docker instalado
 
-### Passo 1: Criar Cluster EKS
+### Passo 1: Criar infraestrutura na aws via Terraform
 
-**Opção A - AWS Academy (via Console):**
-1. Acesse o Console AWS → EKS → Create Cluster
-2. Selecione `LabRole` como Cluster Role
-3. Crie um Node Group com `LabRole` como Node IAM Role
+### ⚠️ Os módulos terraform criam os seguintes componentes 
+### Necessário configurar o seu aws-cli 
 
-**Opção B - Conta Pessoal (via eksctl):**
-```bash
-eksctl create cluster \
-  --name tech-challenge-cluster \
-  --region us-east-1 \
-  --nodegroup-name workers \
-  --node-type t3.medium \
-  --nodes 2 \
-  --nodes-min 1 \
-  --nodes-max 4 \
-  --managed
-```
+| modulo | recurso | 
+|---------|-------------|
+| Cluster | Criar cluster eks |
+| network | Cria toda a pavimentação de redes na aws tais como vpc,subnet,internet gateway, nat gateway, route table e elastic IP|
+| registry | Cria um ECR container registry |
+| sqs | Cria uma instancia sqs |
+| elasticache | Cria um cluster elasticcache rodando redis |
+| db          | Cria 3 banco de dados RDS com engine do postgres|
 
-### Passo 2: Criar Repositórios ECR
 
 ```bash
-aws ecr create-repository --repository-name tech-challenge/auth-service --region us-east-1
-aws ecr create-repository --repository-name tech-challenge/flag-service --region us-east-1
-aws ecr create-repository --repository-name tech-challenge/targeting-service --region us-east-1
-aws ecr create-repository --repository-name tech-challenge/evaluation-service --region us-east-1
-aws ecr create-repository --repository-name tech-challenge/analytics-service --region us-east-1
+git clone https://github.com/nascied/tech-challenge-fase-2-fiap.git
+cd tech-challenge-fase-2-fiap
 ```
 
-### Passo 3: Criar Recursos de Dados
-
-**3.1. Fila SQS:**
+### navega até o diretório iac/terraform
 ```bash
-aws sqs create-queue --queue-name tech-challenge-events --region us-east-1
+curl https://releases.hashicorp.com/terraform/1.14.7/terraform_1.14.7_linux_amd64.zip -o terraform_1.14.7_linux_amd64.zip
+unzip terraform_1.14.7_linux_amd64.zip 
+chmod a+x terraform
+sudo mv -v terraform  /usr/local/bin
+cd iac/terraform
+terraform plan
+terrform apply -auto-approve
 ```
 
-**3.2. Tabela DynamoDB:**
-> ⚠️ **IMPORTANTE:** O nome da tabela deve ser `ToggleMasterAnalytics` com chave primária `event_id`.
-
-```bash
-aws dynamodb create-table \
-  --table-name ToggleMasterAnalytics \
-  --attribute-definitions AttributeName=event_id,AttributeType=S \
-  --key-schema AttributeName=event_id,KeyType=HASH \
-  --billing-mode PAY_PER_REQUEST \
-  --region us-east-1
-```
-
-**3.3. RDS PostgreSQL (3 instâncias):**
-Criar via Console ou CLI:
-- `tech-challenge-auth-db`
-- `tech-challenge-flag-db`
-- `tech-challenge-targeting-db`
-
-**3.4. ElastiCache Redis:**
-Criar via Console ou CLI um cluster Redis.
-
-### Passo 4: Build e Push das Imagens
+### Passo 2: Build e Push das Imagens
 
 ```bash
 # Login no ECR
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <account-id>.dkr.ecr.us-east-1.amazonaws.com
+aws ecr get-login-password  --region us-east-1 | docker login --username AWS --password-stdin <account-id>.dkr.ecr.us-east-1.amazonaws.com/fiap-tc-f2-repo
 
 # Build e push de cada serviço
-docker build -t <account-id>.dkr.ecr.us-east-1.amazonaws.com/tech-challenge/auth-service:latest ./auth-service
-docker push <account-id>.dkr.ecr.us-east-1.amazonaws.com/tech-challenge/auth-service:latest
+docker build -t auth-service:v1 .
+docker tag auth-service:v1 <account-id>.dkr.ecr.us-east-1.amazonaws.com/fiap-tc-f2-reg:auth-service-v1
+docker push <account-id>.dkr.ecr.us-east-1.amazonaws.com/fiap-tc-f2-reg:auth-service-v1
 
-docker build -t <account-id>.dkr.ecr.us-east-1.amazonaws.com/tech-challenge/flag-service:latest ./flag-service
-docker push <account-id>.dkr.ecr.us-east-1.amazonaws.com/tech-challenge/flag-service:latest
+docker build -t flag-service:v1
+docker tag flag-service:v1 <account-id>.dkr.ecr.us-east-1.amazonaws.com/fiap-tc-f2-reg:flag-service-v1
+docker push <account-id>.dkr.ecr.us-east-1.amazonaws.com/fiap-tc-f2-repo/flag-service:v1
 
-docker build -t <account-id>.dkr.ecr.us-east-1.amazonaws.com/tech-challenge/targeting-service:latest ./targeting-service
-docker push <account-id>.dkr.ecr.us-east-1.amazonaws.com/tech-challenge/targeting-service:latest
+docker build -t targeting-servic:v1 .
+docker tag targeting-service:v1 <account-id>.dkr.ecr.us-east-1.amazonaws.com/fiap-tc-f2-reg:targeting-service-v1
+docker push <account-id>.dkr.ecr.us-east-1.amazonaws.com/fiap-tc-f2-repo/targeting-service:v1
 
-docker build -t <account-id>.dkr.ecr.us-east-1.amazonaws.com/tech-challenge/evaluation-service:latest ./evaluation-service
-docker push <account-id>.dkr.ecr.us-east-1.amazonaws.com/tech-challenge/evaluation-service:latest
+docker build -t evaluation-service:v1
+docker tag evaluation-service:v1 <account-id>.dkr.ecr.us-east-1.amazonaws.com/fiap-tc-f2-reg:evaluation-service-v1 
+docker push <account-id>.dkr.ecr.us-east-1.amazonaws.com/fiap-tc-f2-reg: evaluation-service-v1 
 
-docker build -t <account-id>.dkr.ecr.us-east-1.amazonaws.com/tech-challenge/analytics-service:latest ./analytics-service
-docker push <account-id>.dkr.ecr.us-east-1.amazonaws.com/tech-challenge/analytics-service:latest
+docker build -t analytics-service:v1
+docker tag analytics-service:v1 <account-id>.dkr.ecr.us-east-1.amazonaws.com/fiap-tc-f2-reg:analytics-service-v1
+docker push <account-id>.dkr.ecr.us-east-1.amazonaws.com/fiap-tc-f2-reg:analytics-service-v1
 ```
 
-### Passo 5: Configurar kubectl
+### Passo 3: Instalar e configurar kubectl
 
 ```bash
-aws eks update-kubeconfig --region us-east-1 --name tech-challenge-cluster
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+sudo mv -v kubeconfig /usr/local/bin
+```
+
+```bash
+aws eks update-kubeconfig --region us-east-1 --name fiap-tc-f2-eks
 kubectl get nodes  # Verificar conexão
 ```
 
-### Passo 6: Instalar Componentes do Cluster
+### Passo 4: Instalar Componentes do Cluster
 
-**6.1. Metrics Server (se não instalado automaticamente):**
-```bash
-kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
-```
-
-**6.2. Nginx Ingress Controller:**
+**4.1. Nginx Ingress Controller**
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.9.5/deploy/static/provider/aws/deploy.yaml
+
+- validar pods do nginx controller
+kubectl get po -n nginx-gateway
 ```
 
-### Passo 7: Configurar Secrets
+### Passo 5 Configurar Secrets
 
 > ⚠️ **AWS Academy:** Inclua `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` e `AWS_SESSION_TOKEN` nos secrets.
 
-Edite o arquivo `k8s/secrets/secrets.yaml` com seus endpoints:
+Edite o arquivo `k8s/<diretorio_do_servico>/<nomeservico-service-secrets.yml` com seus endpoints:
 
 ```yaml
 apiVersion: v1
 kind: Secret
 metadata:
-  name: auth-db-secret
-  namespace: tech-challenge
+  name: auth-service-secret
+  namespace: fiap-tc-f2
 type: Opaque
-stringData:
+data:
   DATABASE_URL: "postgres://postgres:<senha>@<endpoint-rds>:5432/postgres"
   MASTER_KEY: "sua-master-key-secreta"
 
@@ -437,20 +387,20 @@ stringData:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: flag-db-secret
-  namespace: tech-challenge
+  name: flag-service-secret
+  namespace: fiap-tc-f2
 type: Opaque
-stringData:
+data:
   DATABASE_URL: "postgres://postgres:<senha>@<endpoint-rds>:5432/postgres"
 
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: targeting-db-secret
-  namespace: tech-challenge
+  name: targeting-service-secret
+  namespace: fiap-tc-f2
 type: Opaque
-stringData:
+data:
   DATABASE_URL: "postgres://postgres:<senha>@<endpoint-rds>:5432/postgres"
 
 ---
@@ -484,14 +434,7 @@ stringData:
 
 ```bash
 # Aplicar na ordem correta
-kubectl apply -f k8s/namespaces/
-kubectl apply -f k8s/secrets/
-kubectl apply -f k8s/configmaps/
-kubectl apply -f k8s/deployments/
-kubectl apply -f k8s/services/
-kubectl apply -f k8s/ingress/
-kubectl apply -f k8s/hpa/
-```
+kubectl apply -k -f k8s/common/kustomization.yml
 
 ### Passo 9: Inicializar Tabelas nos Bancos RDS
 
@@ -546,13 +489,13 @@ exit
 
 ```bash
 # Ver pods
-kubectl get pods -n tech-challenge
+kubectl get pods -n fiap-tc-f2
 
 # Ver services
-kubectl get svc -n tech-challenge
+kubectl get svc -n fiap-tc-f2
 
 # Ver HPAs
-kubectl get hpa -n tech-challenge
+kubectl get hpa -n fiap-tc-f2
 
 # Pegar URL do Load Balancer
 kubectl get svc -n ingress-nginx ingress-nginx-controller
@@ -607,12 +550,12 @@ hey -z 120s -c 200 "http://<load-balancer-url>/evaluate/evaluate?flag_name=enabl
 
 **3. Em outro terminal, monitore o HPA:**
 ```bash
-kubectl get hpa -n tech-challenge -w
+kubectl get hpa -n fiap-tc-f2 -w
 ```
 
 **4. Monitore os pods escalando:**
 ```bash
-kubectl get pods -n tech-challenge -w
+kubectl get pods -n fiap-tc-f2 -w
 ```
 
 Você verá o HPA aumentar o número de réplicas quando a CPU ultrapassar 70%.
@@ -623,11 +566,11 @@ Você verá o HPA aumentar o número de réplicas quando a CPU ultrapassar 70%.
 
 | Serviço | Rota Local | Rota AWS (via Ingress) |
 |---------|------------|------------------------|
-| auth-service | `localhost:8001/*` | `/auth/*` |
-| flag-service | `localhost:8002/*` | `/flags/*` |
-| targeting-service | `localhost:8003/*` | `/targeting/*` |
-| evaluation-service | `localhost:8004/*` | `/evaluate/*` |
-| analytics-service | `localhost:8005/*` | `/analytics/*` |
+| auth-service-svc | `localhost:8001/*` | `/auth/*` |
+| flag-service-svc | `localhost:8002/*` | `/flags/*` |
+| targeting-service-svc | `localhost:8003/*` | `/targeting/*` |
+| evaluation-service-svc | `localhost:8004/*` | `/evaluate/*` |
+| analytics-service-svc | `localhost:8005/*` | `/analytics/*` |
 
 ---
 
@@ -656,42 +599,19 @@ Você verá o HPA aumentar o número de réplicas quando a CPU ultrapassar 70%.
 ---
 
 ## 🔧 Troubleshooting
-
-### Erro: "InvalidClientTokenId: The security token included in the request is invalid"
-- **Causa:** Token do AWS Academy expirou
-- **Solução:** Pegue novas credenciais no AWS Academy e atualize o secret:
-```bash
-kubectl delete secret aws-secret -n tech-challenge
-kubectl create secret generic aws-secret -n tech-challenge \
-  --from-literal=AWS_REGION=us-east-1 \
-  --from-literal=AWS_SQS_URL=<url> \
-  --from-literal=AWS_DYNAMODB_TABLE=ToggleMasterAnalytics \
-  --from-literal=AWS_ACCESS_KEY_ID=<nova-key> \
-  --from-literal=AWS_SECRET_ACCESS_KEY=<nova-secret> \
-  --from-literal=AWS_SESSION_TOKEN=<novo-token>
-kubectl rollout restart deployment/evaluation-service -n tech-challenge
-kubectl rollout restart deployment/analytics-service -n tech-challenge
-```
-
 ### Erro: "Unable to locate credentials"
 - **Causa:** Variáveis de ambiente AWS não estão sendo injetadas no pod
 - **Solução:** Verifique se o deployment inclui as variáveis do secret:
 ```bash
-kubectl get deployment <nome> -n tech-challenge -o yaml | grep -A 30 "env:"
+kubectl get deployment <nome> -n fiap-tc-f2 -o yaml | grep -A 30 "env:"
+kubect exec <nome pod> -- env
 ```
 
 ### Erro: "relation does not exist"
-- **Causa:** Tabelas não foram criadas no banco RDS
-- **Solução:** Execute os scripts SQL de inicialização (ver Passo 9)
+- **Causa:** Tabelas não foram criadas no banco RDS ou endereço das variaveis estão errados
+- **Solução:** Execute os scripts SQL de inicialização (ver Passo 9) revisar as variaveis config Map
 
-### Load Balancer com EXTERNAL-IP "pending"
-- **Causa:** Conta AWS nova pode ter restrições para criar ELBs
-- **Solução:** Use NodePort como alternativa:
-```bash
-kubectl patch svc ingress-nginx-controller -n ingress-nginx -p '{"spec": {"type": "NodePort"}}'
-kubectl get nodes -o wide  # Pegar IP externo do node
-# Acessar via http://<node-ip>:<node-port>
-```
+
 
 ---
 
@@ -705,4 +625,4 @@ kubectl get nodes -o wide  # Pegar IP externo do node
 
 ## 📄 Licença
 
-Este projeto é apenas para fins educacionais como parte do programa de pós-graduação da FIAP.
+Este projeto é apenas para fins educacionais como parte do programa de pós-graduação devops arquitetura Cloud da instituição FIAP.

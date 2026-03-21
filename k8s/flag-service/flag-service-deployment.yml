@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: flag-service
-          image: 
+          image: 226226079541.dkr.ecr.us-east-1.amazonaws.com/fiap-tc-f2-reg:flag-service-v1
           ports:
             - containerPort: 8002
           resources:
@@ -48,16 +48,16 @@ spec:
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: auth-service-secret
+                  name: flag-service-secret
                   key: DATABASE_URL
             - name: PORT
               valueFrom:
                 configMapKeyRef:
-                  name: auth-service-config-map
+                  name: flag-service-config-map
                   key: PORT
             - name: AUTH_SERVICE_URL
               valueFrom:
                 configMapKeyRef:
-                  name: auth-service-config-map
+                  name: flag-service-config-map
                   key: AUTH_SERVICE_URL
                   

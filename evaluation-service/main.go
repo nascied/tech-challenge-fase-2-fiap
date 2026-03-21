@@ -12,6 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/go-redis/redis/v8"
 	"github.com/joho/godotenv"
+	"github.com/aws/aws-sdk-go/aws/credentials" //adicionado essa linha para poder autenticar na aws
 )
 
 // Contexto global para o Redis
@@ -73,17 +74,60 @@ func main() {
 		log.Fatalf("Não foi possível conectar ao Redis: %v", err)
 	}
 	log.Println("Conectado ao Redis com sucesso!")
+// Caso for usar com localstack descomentar esssas linhas
+// 	Cliente SQS (AWS SDK)
+// 	var sqsSvc *sqs.SQS
+// 	if sqsQueueURL != "" {
+// 		sess, err := session.NewSession(&aws.Config{Region: aws.String(awsRegion), Endpoint: aws.String(sqsQueueURL)})
+// 		if err != nil {
+// 			log.Fatalf("Não foi possível criar sessão AWS: %v", err)
+// 		}
+// 		sqsSvc = sqs.New(sess)
+// 		log.Println("Cliente SQS inicializado com sucesso.")
+// 	}
+// 	var sqsSvc *sqs.SQS
+//     if sqsQueueURL != "" {
+// 	sess, err := session.NewSession(&aws.Config{
+// 		Region: aws.String(awsRegion),
+// 	})
+// 	if err != nil {
+// 		log.Fatalf("Não foi possível criar sessão AWS: %v", err)
+// 	}
 
-	// Cliente SQS (AWS SDK)
-	var sqsSvc *sqs.SQS
-	if sqsQueueURL != "" {
-		sess, err := session.NewSession(&aws.Config{Region: aws.String(awsRegion), Endpoint: aws.String(sqsQueueURL)})
+// 	sqsSvc = sqs.New(sess)
+// 	log.Println("Cliente SQS inicializado com sucesso.")
+    
+//    }
+
+//É possível usar essa linha de baixo basta forncer para localstack qualquer string de autenticação
+	   var sqsSvc *sqs.SQS
+	   if sqsQueueURL != "" {
+		sqsEndpoint := os.Getenv("AWS_ENDPOINT_URL")
+		
+		awsConfig := &aws.Config{
+			Region: aws.String(awsRegion),
+			Credentials: credentials.NewStaticCredentials(
+				os.Getenv("AWS_ACCESS_KEY_ID"),
+				os.Getenv("AWS_SECRET_ACCESS_KEY"),
+				os.Getenv("AWS_SESSION_TOKEN"),
+			),
+		}
+		
+		if sqsEndpoint != "" {
+			log.Printf("Usando SQS local: %s", sqsEndpoint)
+			awsConfig.Endpoint = aws.String(sqsEndpoint)
+		} else {
+			log.Println("Usando SQS da AWS")
+		}
+		
+		sess, err := session.NewSession(awsConfig)
 		if err != nil {
 			log.Fatalf("Não foi possível criar sessão AWS: %v", err)
 		}
 		sqsSvc = sqs.New(sess)
 		log.Println("Cliente SQS inicializado com sucesso.")
 	}
+
 
 	// Cliente HTTP (com timeout)
 	httpClient := &http.Client{

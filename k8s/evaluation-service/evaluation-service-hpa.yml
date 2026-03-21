@@ -2,6 +2,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: evaluation-service-hpa
+  namespace: fiap-tc-f2
  
 spec:
   scaleTargetRef:
@@ -9,7 +10,7 @@ spec:
     kind: Deployment
     name: evaluation-service
   minReplicas: 1      # Mínimo 1 pod
-  maxReplicas: 3      # Máximo 3 pods
+  maxReplicas: 2      # Máximo 3 pods
   
   metrics:
     - type: Resource
