@@ -5,6 +5,7 @@
 resource "aws_security_group" "this" {
   name        = "${local.resource_prefix_name}-rds-postgres-sg"
   description = "Security group para RDS PostgreSQL"
+  vpc_id      = var.aws_db_subnet_group_vpc_id
 
   ingress {
     from_port   = 5432

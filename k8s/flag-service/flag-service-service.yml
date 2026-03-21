@@ -5,8 +5,8 @@ metadata:
  
 spec:
   selector:
-    app: auth-service
+    app: flag-service
   ports:
-  - port: 8001
-    targetPort: 8001
+  - port: 8002
+    targetPort: 8002
     protocol: TCP

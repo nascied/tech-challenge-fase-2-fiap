@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: analytics-service
+  namespace: fiap-tc-f2
  
 spec:
   selector:
@@ -15,7 +16,7 @@ spec:
     spec:
       containers:
         - name: analytics-service
-          image: 876080138877.dkr.ecr.us-east-1.amazonaws.com/analytics-service:v1
+          image: 226226079541.dkr.ecr.us-east-1.amazonaws.com/fiap-tc-f2-reg:analytics-service-v3
           ports:
             - containerPort: 8005
           resources:
@@ -50,16 +51,19 @@ spec:
                 secretKeyRef:
                   name: analytics-service-secret
                   key: AWS_ACCESS_KEY_ID
+
             - name: AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
                   name: analytics-service-secret
                   key: AWS_SECRET_ACCESS_KEY
+
             - name: AWS_SESSION_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: analytics-service-secret
-                  key: AWS_SESSION_TOKEN
+                  key: AWS_SESSION_TOKEN 
+            
             - name: PORT
               valueFrom:
                 configMapKeyRef:
@@ -75,5 +79,14 @@ spec:
                 configMapKeyRef:
                   name: analytics-service-config-map
                   key: AWS_DYNAMODB_TABLE
-
+            - name: AUTH_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: analytics-service-config-map
+                  key: AUTH_SERVICE_URL
+            - name: AWS_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: analytics-service-config-map
+                  key: AWS_REGION
                   

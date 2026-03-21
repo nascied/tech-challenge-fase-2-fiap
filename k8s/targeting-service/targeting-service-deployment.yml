@@ -7,7 +7,6 @@ spec:
   selector:
     matchLabels:
       app: targeting-service
-  replicas: 1
   template:
     metadata:
       labels:
@@ -15,7 +14,7 @@ spec:
     spec:
       containers:
         - name: targeting-service
-          image: 876080138877.dkr.ecr.us-east-1.amazonaws.com/auth-service:v1
+          image: 226226079541.dkr.ecr.us-east-1.amazonaws.com/fiap-tc-f2-reg:targeting-service-v1
           ports:
             - containerPort: 8003
           resources:
@@ -38,7 +37,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /health
-              port: 8001
+              port: 8003
             initialDelaySeconds: 5
             periodSeconds: 5
             timeoutSeconds: 3

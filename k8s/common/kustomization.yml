@@ -5,6 +5,7 @@ metadata:
  
 resources:
   - ../common/namespace.yml
+  - ../common/gatewayclass.yml
   - ../auth-service/auth-service-configMap.yml
   - ../auth-service/auth-service-service.yml
   - ../auth-service/auth-service-secret.yml
