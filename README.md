@@ -318,6 +318,7 @@ cd iac/terraform
 terraform plan
 terrform apply -auto-approve
 ```
+![Alt text](./image/terraform_apply_finish.png)
 
 ### Passo 2: Build e Push das Imagens
 
