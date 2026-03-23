@@ -33,9 +33,9 @@ resource "aws_eks_node_group" "this" {
   capacity_type   = "ON_DEMAND"
 
   scaling_config {
-    desired_size = 2
-    max_size     = 2
-    min_size     = 2
+    desired_size = 3
+    max_size     = 3
+    min_size     = 1
   }
 
   depends_on = [
@@ -46,7 +46,7 @@ resource "aws_eks_node_group" "this" {
 
 resource "aws_eks_access_entry" "this" {
   cluster_name  = aws_eks_cluster.this.name
-  principal_arn = "arn:aws:iam::226226079541:role/voclabs"
+  principal_arn = "arn:aws:iam::913901705985:role/voclabs"
 
   type     = "STANDARD"
   # user_name = "arn:aws:sts::226226079541:assumed-role/voclabs/{{SessionName}}"
@@ -54,7 +54,8 @@ resource "aws_eks_access_entry" "this" {
 
 resource "aws_eks_access_policy_association" "this" {
   cluster_name  = aws_eks_cluster.this.name
-  principal_arn = "arn:aws:iam::226226079541:role/voclabs"
+  principal_arn = "arn:aws:iam::913901705985:role/voclabs"
+
 
   policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
 

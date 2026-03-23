@@ -10,7 +10,7 @@ spec:
     kind: Deployment
     name: evaluation-service
   minReplicas: 1      # Mínimo 1 pod
-  maxReplicas: 2      # Máximo 3 pods
+  maxReplicas: 3      # Máximo 3 pods
   
   metrics:
     - type: Resource
