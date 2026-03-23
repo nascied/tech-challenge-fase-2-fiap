@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: evaluation-service
-          image: 226226079541.dkr.ecr.us-east-1.amazonaws.com/fiap-tc-f2-reg:evaluation-service-v1
+          image: 913901705985.dkr.ecr.us-east-1.amazonaws.com/fiap-tc-f2-reg:evaluation-service-v1
           ports:
             - containerPort: 8004
           resources:

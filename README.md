@@ -219,7 +219,7 @@ O sistema é composto por 5 microsserviços:
 **1. Clone o repositório:**
 ```bash
 git clone https://github.com/nascied/tech-challenge-fase-2-fiap.git
-cd ttech-challenge-fase-2-fiap
+cd tech-challenge-fase-2-fiap
 ```
 
 **2. Suba os containers:**
@@ -306,6 +306,9 @@ cd tech-challenge-fase-2-fiap
 ```
 
 ### navega até o diretório iac/terraform
+> ⚠️ **Ajsute no EKS: necessário trocar   "principal_arn = "arn:aws:iam::226226079541:role/voclabs" com respectivo arn da role que pode ser pego com o comando aws iam list-roles --output table"** 
+
+
 ```bash
 curl https://releases.hashicorp.com/terraform/1.14.7/terraform_1.14.7_linux_amd64.zip -o terraform_1.14.7_linux_amd64.zip
 unzip terraform_1.14.7_linux_amd64.zip 
@@ -315,6 +318,7 @@ cd iac/terraform
 terraform plan
 terrform apply -auto-approve
 ```
+![Alt text](./image/terraform_apply_finish.png)
 
 ### Passo 2: Build e Push das Imagens
 
@@ -442,7 +446,7 @@ kubectl apply -k -f k8s/common/kustomization.yml
 # Criar pod temporário com psql
 kubectl run psql-client --rm -it --restart=Never \
   --image=postgres:15-alpine \
-  --namespace=tech-challenge \
+  --namespace=fiap-tc-f2 \
   -- bash
 
 # Dentro do pod, conectar em cada banco e criar as tabelas:
@@ -532,7 +536,7 @@ aws dynamodb scan --table-name ToggleMasterAnalytics --region us-east-1
 
 ---
 
-## 📈 Testando a Escalabilidade (HPA)
+## 📈 Testando a Escalabilidade (HPA e Keda)
 
 **1. Instale o hey (ferramenta de load testing):**
 ```bash
@@ -541,6 +545,10 @@ sudo apt install hey -y
 
 # Ou via Go
 go install github.com/rakyll/hey@latest
+
+helm repo add kedacore https://kedacore.github.io/charts
+helm repo update
+helm install keda kedacore/keda --namespace keda --create-namespace
 ```
 
 **2. Gere carga no evaluation-service:**

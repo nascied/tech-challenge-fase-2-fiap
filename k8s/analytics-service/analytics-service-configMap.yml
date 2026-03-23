@@ -6,6 +6,6 @@ metadata:
 data:
   AUTH_SERVICE_URL: "http://auth-service-svc:8001"
   PORT: "8005"
-  AWS_SQS_URL: "https://sqs.us-east-1.amazonaws.com/226226079541/evaluation-events"
+  AWS_SQS_URL: "https://sqs.us-east-1.amazonaws.com/913901705985/evaluation-events"
   AWS_DYNAMODB_TABLE: "ToggleMasterAnalytics"
   AWS_REGION: "us-east-1"
